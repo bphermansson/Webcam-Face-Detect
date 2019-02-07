@@ -2,7 +2,7 @@ import cv2
 import sys
 import logging as log
 import datetime as dt
-from time import sleep
+import time
 
 cascPath = "haarcascade_frontalface_default.xml"
 faceCascade = cv2.CascadeClassifier(cascPath)
@@ -10,7 +10,10 @@ log.basicConfig(filename='webcam.log',level=log.INFO)
 
 video_capture = cv2.VideoCapture(0)
 anterior = 0
-
+start = time.time()
+print (start)
+prevmotion=0
+detections=0
 while True:
     if not video_capture.isOpened():
         print('Unable to load camera.')
@@ -24,7 +27,7 @@ while True:
 
     faces = faceCascade.detectMultiScale(
         gray,
-        scaleFactor=1.1,
+        scaleFactor=1.2,
         minNeighbors=5,
         minSize=(30, 30)
     )
@@ -37,8 +40,13 @@ while True:
         anterior = len(faces)
         log.info("faces: "+str(len(faces))+" at "+str(dt.datetime.now()))
 
+        if (time.time() - prevmotion) > 5:
+           print("Detect! #" + str(detections))
+           detections+=1
+           prevmotion = time.time()
 
     # Display the resulting frame
+    
     cv2.imshow('Video', frame)
 
 
